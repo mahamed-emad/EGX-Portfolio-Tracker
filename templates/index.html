@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محفظتي | البورصة المصرية</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 1: اختيار المحفظة
+══════════════════════════════════════════════ -->
+<div id="screen-picker" class="screen">
+  <div class="picker-wrap">
+    <div class="picker-logo">📈</div>
+    <h1 class="picker-title">محفظتي</h1>
+    <p class="picker-sub">البورصة المصرية — اختر محفظتك</p>
+
+    <div class="picker-users" id="picker-users">
+      <!-- dynamic -->
+    </div>
+
+    <div class="picker-divider"><span>أو أنشئ محفظة جديدة</span></div>
+
+    <div class="new-user-form">
+      <input id="nu-dname"    type="text" placeholder="الاسم المعروض (مثال: أحمد)">
+      <input id="nu-username" type="text" placeholder="اسم المستخدم (بالإنجليزية — مثال: ahmed)">
+      <button class="btn-primary" onclick="createUser()">➕ إنشاء محفظة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 2: التطبيق الرئيسي
+══════════════════════════════════════════════ -->
+<div id="screen-app" class="screen" style="display:none">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">📈</span>
+      <div class="brand-text">
+        <span class="brand-title">محفظتي</span>
+        <span class="brand-sub">البورصة المصرية</span>
+      </div>
+    </div>
+    <div class="header-user" id="header-user">
+      <span class="user-avatar" id="user-avatar">؟</span>
+      <span id="user-label">--</span>
+    </div>
+    <div class="header-clock" id="clock">--:--:--</div>
+    <button class="refresh-btn" onclick="refreshAll()">
+      <span class="refresh-icon" id="refresh-icon">⟳</span> تحديث
+    </button>
+    <button class="logout-btn" onclick="logout()" title="تغيير المحفظة">⇄</button>
+  </header>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toast"></div>
+
+  <main class="app-main">
+
+    <!-- SUMMARY CARDS -->
+    <section class="summary-grid">
+      <div class="card card--blue">
+        <div class="card-label">إجمالي الإيداع</div>
+        <div class="card-value" id="val-deposited">--</div>
+        <div class="card-sub">سحب: <span id="val-withdrawn">--</span></div>
+      </div>
+      <div class="card card--teal">
+        <div class="card-label">السيولة المتاحة</div>
+        <div class="card-value" id="val-cash">--</div>
+        <div class="card-sub">صافي: <span id="val-net">--</span></div>
+      </div>
+      <div class="card card--purple">
+        <div class="card-label">قيمة المحفظة الكلية</div>
+        <div class="card-value" id="val-total">--</div>
+        <div class="card-sub">أسهم: <span id="val-stocks">--</span></div>
+      </div>
+      <div class="card card--profit" id="card-profit">
+        <div class="card-label">الربح / الخسارة</div>
+        <div class="card-value" id="val-profit-amt">--</div>
+        <div class="card-pct"   id="val-profit-pct">-- %</div>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="portfolio"  onclick="switchTab('portfolio')">💼 المحفظة</button>
+      <button class="tab-btn"        data-tab="operations" onclick="switchTab('operations')">⚡ العمليات</button>
+      <button class="tab-btn"        data-tab="log"        onclick="switchTab('log')">📋 السجل</button>
+      <button class="tab-btn"        data-tab="stocks"     onclick="switchTab('stocks')">🏦 الأسهم</button>
+    </nav>
+
+    <!-- TAB: PORTFOLIO -->
+    <section class="tab-content active" id="tab-portfolio">
+      <div class="section-header">
+        <h2>الأسهم في المحفظة</h2>
+        <button class="btn-outline" onclick="loadHoldings()">⟳ تحديث الأسعار</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr>
+            <th>الكود</th><th>الشركة</th><th>عدد الأسهم</th>
+            <th>القيمة الشرائية</th><th>متوسط التكلفة</th>
+            <th>السعر الحالي</th><th>ر/خ (ج)</th><th>ر/خ (%)</th>
+          </tr></thead>
+          <tbody id="holdings-body">
+            <tr><td colspan="8" class="empty-row">لا توجد أسهم</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: OPERATIONS -->
+    <section class="tab-content" id="tab-operations">
+      <div class="ops-grid">
+
+        <!-- BUY -->
+        <div class="op-card op-buy">
+          <div class="op-icon">🟢</div><h3>شراء أسهم</h3>
+          <div class="form-group">
+            <label>كود السهم</label>
+            <input id="buy-code" type="text" placeholder="مثال: COMI"
+                   oninput="liveSearch(this,'buy-name','buy-ac')" autocomplete="off">
+            <div class="autocomplete-list" id="buy-ac"></div>
+          </div>
+          <div class="form-group">
+            <label>اسم الشركة</label>
+            <input id="buy-name" type="text" readonly placeholder="يتعبأ تلقائياً">
+          </div>
+          <div class="form-group">
+            <label>عدد الأسهم</label>
+            <input id="buy-qty" type="number" placeholder="0" min="1" oninput="buyPreview()">
+          </div>
+          <div class="form-group">
+            <label>المبلغ الإجمالي المدفوع (جنيه)</label>
+            <input id="buy-amt" type="number" placeholder="0.00" step="0.01" oninput="buyPreview()">
+          </div>
+          <div class="form-group">
+            <label>ملاحظات</label>
+            <input id="buy-notes" type="text" placeholder="اختياري">
+          </div>
+          <div class="calc-preview" id="buy-preview"></div>
+          <button class="op-btn buy-btn" onclick="doBuy()">✔ تنفيذ الشراء</button>
+        </div>
+
+        <!-- SELL -->
+        <div class="op-card op-sell">
+          <div class="op-icon">🔴</div><h3>بيع أسهم</h3>
+          <div class="form-group">
+            <label>كود السهم</label>
+            <input id="sell-code" type="text" placeholder="مثال: COMI"
+                   oninput="liveSearch(this,'sell-name','sell-ac')" autocomplete="off">
+            <div class="autocomplete-list" id="sell-ac"></div>
+          </div>
+          <div class="form-group">
+            <label>اسم الشركة</label>
+            <input id="sell-name" type="text" readonly placeholder="يتعبأ تلقائياً">
+          </div>
+          <div class="form-group">
+            <label>عدد الأسهم المُباعة</label>
+            <input id="sell-qty" type="number" placeholder="0" min="1">
+          </div>
+          <div class="form-group">
+            <label>المبلغ الإجمالي المُستلم (جنيه)</label>
+            <input id="sell-amt" type="number" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>ملاحظات</label>
+            <input id="sell-notes" type="text" placeholder="اختياري">
+          </div>
+          <button class="op-btn sell-btn" onclick="doSell()">✔ تنفيذ البيع</button>
+        </div>
+
+        <!-- DEPOSIT -->
+        <div class="op-card op-deposit">
+          <div class="op-icon">💵</div><h3>إيداع نقدي</h3>
+          <div class="form-group">
+            <label>مبلغ الإيداع (جنيه)</label>
+            <input id="dep-amt" type="number" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>ملاحظات</label>
+            <input id="dep-notes" type="text" placeholder="اختياري">
+          </div>
+          <button class="op-btn dep-btn" onclick="doDeposit()">✔ تنفيذ الإيداع</button>
+        </div>
+
+        <!-- WITHDRAW -->
+        <div class="op-card op-withdraw">
+          <div class="op-icon">🏧</div><h3>سحب نقدي</h3>
+          <div class="form-group">
+            <label>مبلغ السحب (جنيه)</label>
+            <input id="wit-amt" type="number" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>ملاحظات</label>
+            <input id="wit-notes" type="text" placeholder="اختياري">
+          </div>
+          <button class="op-btn wit-btn" onclick="doWithdraw()">✔ تنفيذ السحب</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB: LOG -->
+    <section class="tab-content" id="tab-log">
+      <div class="section-header">
+        <h2>سجل العمليات</h2>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterLog('all',this)">الكل</button>
+          <button class="filter-btn" onclick="filterLog('buy',this)">شراء</button>
+          <button class="filter-btn" onclick="filterLog('sell',this)">بيع</button>
+          <button class="filter-btn" onclick="filterLog('deposit',this)">إيداع</button>
+          <button class="filter-btn" onclick="filterLog('withdraw',this)">سحب</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr>
+            <th>#</th><th>النوع</th><th>التاريخ والوقت</th><th>الكود</th>
+            <th>الشركة</th><th>عدد الأسهم</th><th>سعر السهم</th><th>الإجمالي</th><th>ملاحظات</th>
+          </tr></thead>
+          <tbody id="log-body">
+            <tr><td colspan="9" class="empty-row">لا توجد عمليات</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: STOCKS DATABASE -->
+    <section class="tab-content" id="tab-stocks">
+      <div class="section-header">
+        <h2>🏦 قاعدة بيانات الأسهم المصرية</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input id="stocks-search" type="text" class="search-input"
+                 placeholder="ابحث بالكود أو الاسم..." oninput="searchStocksDB()">
+          <span id="stocks-count" style="color:var(--text-muted);font-size:12px"></span>
+        </div>
+      </div>
+
+      <!-- Add single stock -->
+      <div class="add-stock-box">
+        <h4>➕ إضافة سهم جديد</h4>
+        <div class="add-stock-form">
+          <input id="as-code"   type="text" placeholder="كود السهم (مثال: ICFC)">
+          <input id="as-name"   type="text" placeholder="اسم الشركة">
+          <input id="as-sector" type="text" placeholder="القطاع (مثال: كيماويات)">
+          <button class="btn-primary sm" onclick="addSingleStock()">إضافة</button>
+        </div>
+      </div>
+
+      <!-- Bulk add -->
+      <div class="add-stock-box" style="margin-top:16px">
+        <h4>📋 إضافة أسهم متعددة دفعة واحدة</h4>
+        <p class="hint">أدخل كل سهم في سطر بالشكل: <code>كود,اسم,قطاع</code></p>
+        <textarea id="bulk-input" rows="8" placeholder="ICFC,الدولية للأسمدة والكيماويات,كيماويات
+NEWCO,شركة جديدة,قطاع
+..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button class="btn-primary sm" onclick="doBulkAdd()">✔ إضافة الكل</button>
+          <button class="btn-outline  sm" onclick="document.getElementById('bulk-input').value=''">مسح</button>
+        </div>
+      </div>
+
+      <!-- Stocks table -->
+      <div class="table-wrapper" style="margin-top:20px">
+        <table class="data-table">
+          <thead><tr><th>الكود</th><th>اسم الشركة</th><th>القطاع</th></tr></thead>
+          <tbody id="stocks-body">
+            <tr><td colspan="3" class="empty-row">جاري التحميل...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /screen-app -->
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading"><div class="loading-box"><div class="spinner"></div><div class="loading-msg" id="loading-msg">جاري جلب الأسعار...</div></div></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
