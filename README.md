@@ -2,8 +2,6 @@
 
 **Portfolio tracker with real-time EGX price integration — built to solve my own investment tracking problem**
 
-[🚀 Getting Started](#-getting-started) · [✨ Features](#-features) · [🏗️ Architecture](#️-architecture) · [📡 API](#-api-reference) · [🗺️ Roadmap](#️-roadmap)
-
 </div>
 
 ---
