@@ -260,6 +260,17 @@ def fetch_portfolio_prices(tickers: List[str]) -> dict:
         info = _deep_fallback_single(t)
         if info:
             result[t] = info
+        else:
+            import requests
+            from bs4 import BeautifulSoup
+            url = f"https://english.mubasher.info/markets/EGX/stocks/{t}/"
+            response = requests.get(url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            price = soup.find(
+                class_="market-summary__last-price down-icon-only"
+            ).get_text()
+            result[t] = {"price": price}
 
     return result
 
