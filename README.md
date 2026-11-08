@@ -2,59 +2,58 @@
 
 **Portfolio tracker with real-time EGX price integration — built to solve my own investment tracking problem**
 
-</div>
-
----
+* * *
 
 ## 💡 Why I Built This
 
 Tracking an Egyptian stock portfolio manually means juggling spreadsheets, refreshing broker apps, and doing mental math on every position.
 
 I wanted **one place** that tells me:
+
 - What I own and at what average cost
 - What it's worth **right now** at the live market price
 - How much I'm up or down — per stock and in total
 
 So I built it. Clean Python backend, Arabic RTL interface, live prices pulled straight from TradingView.
 
----
+* * *
 
 ## ✨ Features
 
-| | Feature | Details |
-|--|---------|---------|
-| 📊 | **Real-time Prices** | Live EGX prices via TradingView Scanner API + 5 fallback sources |
-| 🧮 | **Auto P&L** | Weighted average cost vs. live price — calculated automatically |
-| 💼 | **Portfolio View** | Holdings, cost basis, current value, daily change per stock |
-| 💰 | **Cash Management** | Track deposits, withdrawals, and available liquidity |
-| 📋 | **Transaction Log** | Complete history — buy / sell / deposit / withdraw with timestamps |
-| 👥 | **Multi-Portfolio** | Each user has a fully isolated database — zero cross-contamination |
+|   | Feature                | Details                                                             |
+|---|------------------------|---------------------------------------------------------------------|
+| 📊 | **Real-time Prices**   | Live EGX prices via TradingView Scanner API + 5 fallback sources    |
+| 🧮 | **Auto P&L**           | Weighted average cost vs. live price — calculated automatically     |
+| 💼 | **Portfolio View**     | Holdings, cost basis, current value, daily change per stock         |
+| 💰 | **Cash Management**    | Track deposits, withdrawals, and available liquidity                |
+| 📋 | **Transaction Log**    | Complete history — buy / sell / deposit / withdraw with timestamps  |
+| 👥 | **Multi-Portfolio**    | Each user has a fully isolated database — zero cross-contamination  |
 | 🏦 | **EGX Stock Database** | Pre-loaded Egyptian stocks + bulk CSV import for 100+ custom stocks |
-| 🔒 | **Smart Validation** | Prevents overselling, overdraft, and invalid tickers |
-| 🌙 | **Arabic UI** | Full RTL dark interface in Egyptian Arabic |
+| 🔒 | **Smart Validation**   | Prevents overselling, overdraft, and invalid tickers                |
+| 🌙 | **Arabic UI**          | Full RTL dark interface in Egyptian Arabic                          |
 
----
+* * *
 
 ## 🖥️ Interface Preview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  📈 محفظتي              أحمد ↗     14:32:07    ⟳ تحديث     │
+│  📈 My Portfolio        Ahmed ↗     14:32:07    ⟳ Refresh   │
 ├──────────────┬──────────────┬──────────────┬────────────────┤
-│ إجمالي الإيداع│  السيولة     │ قيمة المحفظة │   الربح/الخسارة│
-│  100,000 ج   │   37,000 ج   │  105,400 ج   │  +5,400 +5.4%  │
+│  Deposits    │     Cash     │  Portfolio   │ Profit / Loss  │
+│  100,000 EGP │  37,000 EGP  │  105,400 EGP │  +5,400 +5.4%  │
 ├──────────────┴──────────────┴──────────────┴────────────────┤
-│  💼 المحفظة    ⚡ العمليات    📋 السجل    🏦 الأسهم          │
+│  💼 Portfolio    ⚡ Operations    📋 Log    🏦 Stocks        │
 ├───────┬──────────────────┬──────┬────────┬────────┬─────────┤
-│ الكود │     الشركة       │ عدد  │ متوسط  │ الحالي │  ر/خ % │
+│ Code  │     Company      │ Qty  │  Avg   │Current │  P/L %  │
 ├───────┼──────────────────┼──────┼────────┼────────┼─────────┤
-│ COMI  │ CIB              │ 100  │ 85.00  │ 91.50  │ +7.6% 🟢│
-│ ACTF  │ أكتيف            │ 500  │ 12.30  │ 11.80  │ -4.1% 🔴│
-│ ETEL  │ المصرية للاتصالات│ 200  │ 22.50  │ 24.10  │ +7.1% 🟢│
+│ COMI  │ CIB              │ 100  │  85.00 │  91.50 │ +7.6% 🟢│
+│ ACTF  │ Active           │ 500  │  12.30 │  11.80 │ -4.1% 🔴│
+│ ETEL  │ Telecom Egypt    │ 200  │  22.50 │  24.10 │ +7.1% 🟢│
 └───────┴──────────────────┴──────┴────────┴────────┴─────────┘
 ```
 
----
+* * *
 
 ## 🏗️ Architecture
 
@@ -122,21 +121,21 @@ Portfolio stocks
 ⑥ EGX Official API  ──────────────────  one by one
 ```
 
-TradingView resolves 95%+ of cases in a single HTTP request.
-Fallbacks exist for edge cases and newly listed stocks.
+TradingView resolves 95%+ of cases in a single HTTP request. Fallbacks exist for edge cases and newly listed stocks.
 
----
+* * *
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 ```
 Python 3.11+
 ```
 
 ### Installation
 
-```bash
+```
 # 1. Clone the repo
 git clone https://github.com/mahamed-emad/EGX-Portfolio-Tracker.git
 cd EGX-Portfolio-Tracker
@@ -159,11 +158,12 @@ Open **`http://localhost:5000`** in your browser.
 ④ Hit Refresh            →  live prices load, P&L calculates automatically
 ```
 
----
+* * *
 
 ## 📋 How Operations Work
 
 ### 🟢 Buy
+
 Records a purchase and calculates the weighted average cost.
 
 ```
@@ -175,111 +175,114 @@ New average:  13,000 ÷ 150            =  86.67 EGP/share  ✅
 ```
 
 ### 🔴 Sell
-Reduces holdings. Proceeds are added to cash balance.
-Realized P&L is calculated using the weighted average cost.
+
+Reduces holdings. Proceeds are added to cash balance. Realized P&L is calculated using the weighted average cost.
 
 ### 💵 Deposit / Withdraw
-Manages your cash balance independently of stock positions.
-Deposit increases net investment. Withdraw reduces it — which raises your return % if you're in profit.
 
----
+Manages your cash balance independently of stock positions. Deposit increases net investment. Withdraw reduces it — which raises your return % if you're in profit.
+
+* * *
 
 ## 🔒 Validation Rules
 
-| Scenario | Behavior |
-|----------|----------|
-| Sell more shares than owned | ❌ Blocked with clear message |
-| Withdraw more than cash balance | ❌ Blocked — shows available amount |
-| Buy with insufficient funds | ❌ Blocked — shows shortfall |
-| Invalid / unlisted EGX ticker | ❌ Blocked — must add to DB first |
-| Buy same stock again | ✅ Weighted average recalculated automatically |
+| Scenario                        | Behavior                                      |
+|---------------------------------|-----------------------------------------------|
+| Sell more shares than owned     | ❌ Blocked with clear message                  |
+| Withdraw more than cash balance | ❌ Blocked — shows available amount            |
+| Buy with insufficient funds     | ❌ Blocked — shows shortfall                   |
+| Invalid / unlisted EGX ticker   | ❌ Blocked — must add to DB first              |
+| Buy same stock again            | ✅ Weighted average recalculated automatically |
 
----
+* * *
 
 ## 🏦 Adding Custom Stocks (Bulk Import)
 
 Go to the **Stocks tab** and paste in CSV format — one stock per line:
 
 ```
-COMI,بنك كومرشيال انترناشيونال,بنوك
-ACTF,أكتيف للتأجير التمويلي,خدمات مالية
-VLMRA,فاليور,عقارات
-KRDI,كارديان,تكنولوجيا
+COMI,Commercial International Bank,Banks
+ACTF,Active Leasing,Financial Services
+VLMRA,Valore,Real Estate
+KRDI,Cardian,Technology
 ```
 
 Format: `TICKER, Arabic Name, Sector`
 
 Up to 100+ stocks can be imported in one paste.
 
----
+* * *
 
 ## 📡 API Reference
 
 All responses follow the structure:
-```json
+
+```
 { "ok": true, "data": { ... }, "message": "..." }
 ```
 
 ### Portfolio
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/summary` | Cash balance, total portfolio value, P&L |
-| `GET` | `/api/holdings` | All positions with live prices and P&L |
+| Method | Endpoint              | Description                                |
+|--------|-----------------------|--------------------------------------------|
+| `GET`  | `/api/summary`        | Cash balance, total portfolio value, P&L   |
+| `GET`  | `/api/holdings`       | All positions with live prices and P&L     |
 | `POST` | `/api/market/refresh` | Fetch live prices → recalculate everything |
 
 ### Operations
 
-| Method | Endpoint | Required Body |
-|--------|----------|---------------|
-| `POST` | `/api/buy` | `{ code, quantity, amount }` |
-| `POST` | `/api/sell` | `{ code, quantity, amount }` |
-| `POST` | `/api/deposit` | `{ amount }` |
-| `POST` | `/api/withdraw` | `{ amount }` |
+| Method | Endpoint        | Required Body                |
+|--------|-----------------|------------------------------|
+| `POST` | `/api/buy`      | `{ code, quantity, amount }` |
+| `POST` | `/api/sell`     | `{ code, quantity, amount }` |
+| `POST` | `/api/deposit`  | `{ amount }`                 |
+| `POST` | `/api/withdraw` | `{ amount }`                 |
 
 ### Transaction History
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/transactions` | All history (newest first) |
-| `GET` | `/api/transactions?type=buy` | Filter: `buy` / `sell` / `deposit` / `withdraw` |
+| Method | Endpoint                     | Description                                     |
+|--------|------------------------------|-------------------------------------------------|
+| `GET`  | `/api/transactions`          | All history (newest first)                      |
+| `GET`  | `/api/transactions?type=buy` | Filter: `buy` / `sell` / `deposit` / `withdraw` |
 
 ### Users & Sessions
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/users` | List all portfolios |
-| `POST` | `/api/users` | Create new portfolio `{ username, display_name }` |
-| `POST` | `/api/session` | Select active portfolio `{ username }` |
+| Method | Endpoint       | Description                                       |
+|--------|----------------|---------------------------------------------------|
+| `GET`  | `/api/users`   | List all portfolios                               |
+| `POST` | `/api/users`   | Create new portfolio `{ username, display_name }` |
+| `POST` | `/api/session` | Select active portfolio `{ username }`            |
 
 ### Stock Database
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/stocks/all` | All registered EGX stocks |
-| `GET` | `/api/stocks/search?q=` | Search by code or name |
-| `POST` | `/api/stocks/add` | Add single stock `{ code, name, sector }` |
-| `POST` | `/api/stocks/bulk` | Bulk import `{ stocks: [{code, name, sector}] }` |
+| Method | Endpoint                | Description                                      |
+|--------|-------------------------|--------------------------------------------------|
+| `GET`  | `/api/stocks/all`       | All registered EGX stocks                        |
+| `GET`  | `/api/stocks/search?q=` | Search by code or name                           |
+| `POST` | `/api/stocks/add`       | Add single stock `{ code, name, sector }`        |
+| `POST` | `/api/stocks/bulk`      | Bulk import `{ stocks: [{code, name, sector}] }` |
 
----
+* * *
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Backend | Python 3.11 · Flask 3.0 | Lightweight, readable |
-| Database | SQLite | Zero setup, per-user file isolation |
-| Frontend | Vanilla JS · HTML5 · CSS3 | No framework overhead |
-| UI | RTL Arabic · Dark theme | Built for Egyptian users |
-| Prices | TradingView · Yahoo · yfinance · Stooq | Redundancy + reliability |
+| Layer    | Technology                             | Why                                 |
+|----------|----------------------------------------|-------------------------------------|
+| Backend  | Python 3.11 · Flask 3.0                | Lightweight, readable               |
+| Database | SQLite                                 | Zero setup, per-user file isolation |
+| Frontend | Vanilla JS · HTML5 · CSS3              | No framework overhead               |
+| UI       | RTL Arabic · Dark theme                | Built for Egyptian users            |
+| Prices   | TradingView · Yahoo · yfinance · Stooq | Redundancy + reliability            |
 
 **Dependencies — intentionally minimal:**
+
 ```
 flask>=3.0.0
 requests>=2.31.0
 yfinance>=0.2.40
 ```
----
+
+* * *
 
 ## 👨‍💻 Author
 
@@ -287,30 +290,24 @@ yfinance>=0.2.40
 💬 If you find it useful, give it a ⭐ and share it!
 
 Connect:
-- [LinkedIn](https://linkedin.com/in/mahamed-emad)
-- [Email](mahamed.emad.barakat@gmail.com)
 
----
----
+- [LinkedIn](https://linkedin.com/in/mahamed-emad)
+- [Email](mailto:mahamed.emad.barakat@gmail.com)
+
+* * *
 
 ## ⚠️ Disclaimer
 
-This tool is for **personal portfolio tracking only**.
-It does not provide financial advice or investment recommendations.
-All investment decisions are the sole responsibility of the user.
+This tool is for **personal portfolio tracking only**. It does not provide financial advice or investment recommendations. All investment decisions are the sole responsibility of the user.
 
----
+* * *
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](https://github.com/mahamed-emad/EGX-Portfolio-Tracker/blob/main/LICENSE) for details.
 
----
-
-<div align="center">
+* * *
 
 Built with ☕ and too much time watching stock tickers
 
-**[⭐ Star this repo](https://github.com/mahamed-emad/EGX-Portfolio-Tracker)** if it was useful
-
-</div>
+[**⭐ Star this repo**](https://github.com/mahamed-emad/EGX-Portfolio-Tracker) if it was useful
